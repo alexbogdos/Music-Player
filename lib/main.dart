@@ -39,12 +39,17 @@ class _HomePageState extends State<HomePage> {
           }
         }
         if (found == false) {
-          setState(() {
-            songs.add(Song(
-                title: file.name.substring(0, file.name.length - 4),
-                artist: 'Uknown',
-                path: file.path.toString()));
-          });
+          setState(
+            () {
+              songs.add(
+                Song(
+                  title: file.name.substring(0, file.name.length - 4),
+                  artist: 'Uknown',
+                  path: file.path.toString(),
+                ),
+              );
+            },
+          );
         }
       }
     }
@@ -85,18 +90,183 @@ class _HomePageState extends State<HomePage> {
   bool isPlaying = false;
   double progress = 0.0;
 
-  List<Song> songs = const [
-    Song(
+  List<Song> songs = [
+    const Song(
       title: 'I Am Love',
       artist: 'Alex Bogdos',
       path: '',
     ),
-    Song(
-      title: 'Bottom of a Bottle Yeahh',
+    const Song(
+      title: 'Bottom of a Bottle',
       artist: 'Funky Geezer Music',
       path: '',
     ),
-    Song(
+    const Song(
+      title: 'Who is She?',
+      artist: 'Cockroach',
+      path: '',
+    ),
+    const Song(
+      title: 'I Am Love',
+      artist: 'Alex Bogdos',
+      path: '',
+    ),
+    const Song(
+      title: 'Bottom of a Bottle',
+      artist: 'Funky Geezer Music',
+      path: '',
+    ),
+    const Song(
+      title: 'Who is She?',
+      artist: 'Cockroach',
+      path: '',
+    ),
+    const Song(
+      title: 'I Am Love',
+      artist: 'Alex Bogdos',
+      path: '',
+    ),
+    const Song(
+      title: 'Bottom of a Bottle',
+      artist: 'Funky Geezer Music',
+      path: '',
+    ),
+    const Song(
+      title: 'Who is She?',
+      artist: 'Cockroach',
+      path: '',
+    ),
+    const Song(
+      title: 'I Am Love',
+      artist: 'Alex Bogdos',
+      path: '',
+    ),
+    const Song(
+      title: 'Bottom of a Bottle',
+      artist: 'Funky Geezer Music',
+      path: '',
+    ),
+    const Song(
+      title: 'Who is She?',
+      artist: 'Cockroach',
+      path: '',
+    ),
+    const Song(
+      title: 'I Am Love',
+      artist: 'Alex Bogdos',
+      path: '',
+    ),
+    const Song(
+      title: 'Bottom of a Bottle',
+      artist: 'Funky Geezer Music',
+      path: '',
+    ),
+    const Song(
+      title: 'Who is She?',
+      artist: 'Cockroach',
+      path: '',
+    ),
+    const Song(
+      title: 'I Am Love',
+      artist: 'Alex Bogdos',
+      path: '',
+    ),
+    const Song(
+      title: 'Bottom of a Bottle',
+      artist: 'Funky Geezer Music',
+      path: '',
+    ),
+    const Song(
+      title: 'Who is She?',
+      artist: 'Cockroach',
+      path: '',
+    ),
+    const Song(
+      title: 'I Am Love',
+      artist: 'Alex Bogdos',
+      path: '',
+    ),
+    const Song(
+      title: 'Bottom of a Bottle',
+      artist: 'Funky Geezer Music',
+      path: '',
+    ),
+    const Song(
+      title: 'Who is She?',
+      artist: 'Cockroach',
+      path: '',
+    ),
+    const Song(
+      title: 'I Am Love',
+      artist: 'Alex Bogdos',
+      path: '',
+    ),
+    const Song(
+      title: 'Bottom of a Bottle',
+      artist: 'Funky Geezer Music',
+      path: '',
+    ),
+    const Song(
+      title: 'Who is She?',
+      artist: 'Cockroach',
+      path: '',
+    ),
+    const Song(
+      title: 'I Am Love',
+      artist: 'Alex Bogdos',
+      path: '',
+    ),
+    const Song(
+      title: 'Bottom of a Bottle',
+      artist: 'Funky Geezer Music',
+      path: '',
+    ),
+    const Song(
+      title: 'Who is She?',
+      artist: 'Cockroach',
+      path: '',
+    ),
+    const Song(
+      title: 'I Am Love',
+      artist: 'Alex Bogdos',
+      path: '',
+    ),
+    const Song(
+      title: 'Bottom of a Bottle',
+      artist: 'Funky Geezer Music',
+      path: '',
+    ),
+    const Song(
+      title: 'Who is She?',
+      artist: 'Cockroach',
+      path: '',
+    ),
+    const Song(
+      title: 'I Am Love',
+      artist: 'Alex Bogdos',
+      path: '',
+    ),
+    const Song(
+      title: 'Bottom of a Bottle',
+      artist: 'Funky Geezer Music',
+      path: '',
+    ),
+    const Song(
+      title: 'Who is She?',
+      artist: 'Cockroach',
+      path: '',
+    ),
+    const Song(
+      title: 'I Am Love',
+      artist: 'Alex Bogdos',
+      path: '',
+    ),
+    const Song(
+      title: 'Bottom of a Bottle',
+      artist: 'Funky Geezer Music',
+      path: '',
+    ),
+    const Song(
       title: 'Who is She?',
       artist: 'Cockroach',
       path: '',

@@ -78,7 +78,7 @@ class _SideBarState extends State<SideBar> {
             height: 712,
             width: 300,
             child: Padding(
-              padding: const EdgeInsets.only(top: 80, left: 16, right: 16),
+              padding: const EdgeInsets.only(top: 80, left: 2, right: 2),
               child: ListView.builder(
                 itemCount: widget.songs.length + 1,
                 itemBuilder: (BuildContext context, int index) {
@@ -88,41 +88,47 @@ class _SideBarState extends State<SideBar> {
                       playSong: widget.playSong,
                     );
                   } else {
-                    return Align(
-                      alignment: Alignment.topCenter,
-                      child: SizedBox(
-                        height: 60,
-                        width: 220,
-                        child: TextButton(
-                          onPressed: () {
-                            widget.pickFile();
-                          },
-                          style: TextButton.styleFrom(
-                            backgroundColor:
-                                const Color(0xFFCED2E6).withOpacity(0.4),
-                            primary: const Color(0xFF51698C),
-                          ),
-                          child: Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                            children: const [
-                              Icon(
-                                Icons.open_in_new_rounded,
-                                color: Color(
-                                  0xFF172329,
-                                ),
+                    return Column(
+                      children: [
+                        Align(
+                          alignment: Alignment.topCenter,
+                          child: SizedBox(
+                            height: 60,
+                            width: 220,
+                            child: TextButton(
+                              onPressed: () {
+                                widget.pickFile();
+                              },
+                              style: TextButton.styleFrom(
+                                backgroundColor:
+                                    const Color(0xFFCED2E6).withOpacity(0.4),
+                                primary: const Color(0xFF51698C),
                               ),
-                              Text(
-                                "Choose Songs..",
-                                style: TextStyle(
-                                  color: Color(0xFF172329),
-                                  fontSize: 18,
-                                  fontWeight: FontWeight.w600,
-                                ),
+                              child: Row(
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceEvenly,
+                                children: const [
+                                  Icon(
+                                    Icons.open_in_new_rounded,
+                                    color: Color(
+                                      0xFF172329,
+                                    ),
+                                  ),
+                                  Text(
+                                    "Choose Songs..",
+                                    style: TextStyle(
+                                      color: Color(0xFF172329),
+                                      fontSize: 18,
+                                      fontWeight: FontWeight.w600,
+                                    ),
+                                  ),
+                                ],
                               ),
-                            ],
+                            ),
                           ),
                         ),
-                      ),
+                        const SizedBox(height: 20),
+                      ],
                     );
                   }
                 },
