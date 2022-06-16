@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:temp/classes/song.dart';
+import 'package:music_player/classes/song.dart';
 
 // ignore: must_be_immutable
 class SongPreview extends StatelessWidget {
@@ -22,13 +22,11 @@ class SongPreview extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      // color: Colors.red,
+    return SizedBox(
       height: 440,
       child: Align(
         alignment: Alignment.bottomCenter,
-        child: Container(
-          // color: Colors.amber,
+        child: SizedBox(
           width: 420,
           height: 340,
           child: Column(
@@ -36,12 +34,28 @@ class SongPreview extends StatelessWidget {
               Container(
                 decoration: BoxDecoration(
                   color: const Color(0xFFECEDF5),
-                  borderRadius: BorderRadius.circular(20),
+                  borderRadius: BorderRadius.circular(40),
                 ),
                 child: getImage(song),
               ),
-              Text(song.title),
-              Text(song.author),
+              const SizedBox(height: 15),
+              Text(
+                song.title,
+                style: const TextStyle(
+                  color: Color(0xFF172329),
+                  fontSize: 22,
+                  fontWeight: FontWeight.w700,
+                ),
+              ),
+              const SizedBox(height: 8),
+              Text(
+                song.artist,
+                style: TextStyle(
+                  color: const Color(0xFF172329).withOpacity(0.9),
+                  fontSize: 18,
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
             ],
           ),
         ),
