@@ -103,6 +103,9 @@ class _SideBarState extends State<SideBar> {
                                 backgroundColor:
                                     const Color(0xFFCED2E6).withOpacity(0.4),
                                 primary: const Color(0xFF51698C),
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(30),
+                                ),
                               ),
                               child: Row(
                                 mainAxisAlignment:
