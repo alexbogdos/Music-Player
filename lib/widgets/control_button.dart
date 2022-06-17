@@ -11,10 +11,15 @@ class ControlButton extends StatelessWidget {
 
   final bool isPlaying;
   final Function changeState;
-  final double duration;
+  final int? duration;
 
   @override
   Widget build(BuildContext context) {
+    int dur = 0;
+    if (duration != null) {
+      dur = duration as int;
+    }
+
     return SizedBox(
       // height: 40,
       // width: 40,
@@ -27,7 +32,7 @@ class ControlButton extends StatelessWidget {
           surfaceTintColor: Colors.transparent,
         ),
         onPressed: () {
-          if (duration > 0) {
+          if (dur > 0) {
             changeState();
           }
         },

@@ -9,14 +9,16 @@ class SideBar extends StatefulWidget {
     required this.collapseView,
     required this.songs,
     required this.pickFile,
+    required this.saveSongs,
     Key? key,
   }) : super(key: key);
 
   final Function notifyParent;
-  final Function playSong;
+  final Future<void> Function({required Song song}) playSong;
   final Function collapseView;
   final List<Song> songs;
-  final Function pickFile;
+  final Future<void> Function() pickFile;
+  final Future<void> Function() saveSongs;
 
   @override
   State<SideBar> createState() => _SideBarState();
@@ -96,8 +98,10 @@ class _SideBarState extends State<SideBar> {
                             height: 60,
                             width: 220,
                             child: TextButton(
-                              onPressed: () {
-                                widget.pickFile();
+                              onPressed: () async {
+                                await widget
+                                    .pickFile()
+                                    .then((value) => widget.saveSongs());
                               },
                               style: TextButton.styleFrom(
                                 backgroundColor:

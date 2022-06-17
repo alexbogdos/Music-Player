@@ -49,7 +49,7 @@ class SongPreview extends StatelessWidget {
               ),
               const SizedBox(height: 8),
               Text(
-                song.artist,
+                song.artist == null ? "Uknown" : song.artist.toString(),
                 style: TextStyle(
                   color: const Color(0xFF172329).withOpacity(0.9),
                   fontSize: 18,

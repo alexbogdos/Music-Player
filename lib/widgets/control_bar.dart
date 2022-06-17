@@ -1,3 +1,4 @@
+import 'package:audioplayers/audioplayers.dart';
 import 'package:flutter/material.dart';
 import 'package:music_player/classes/song.dart';
 import 'package:music_player/widgets/control_button.dart';
@@ -5,30 +6,56 @@ import 'package:music_player/widgets/slider.dart';
 
 // ignore: must_be_immutable
 class ControlBar extends StatefulWidget {
-  ControlBar({
+  const ControlBar({
     required this.width,
     required this.isCollapsed,
     required this.song,
-    required this.progress,
+    required this.position,
+    required this.duration,
     required this.isPlaying,
     required this.changePlayingState,
     required this.changeProgress,
+    required this.player,
     Key? key,
   }) : super(key: key);
 
-  double width;
-  bool isCollapsed;
-  Song song;
-  double progress;
-  bool isPlaying;
-  Function changePlayingState;
-  Function changeProgress;
+  final double width;
+  final bool isCollapsed;
+  final Song song;
+  final Duration? position;
+  final Duration? duration;
+  final bool isPlaying;
+  final Function changePlayingState;
+  final Function changeProgress;
+  final AudioPlayer player;
 
   @override
   State<ControlBar> createState() => _ControlBarState();
 }
 
 class _ControlBarState extends State<ControlBar> {
+  String getDuration(String duration) {
+    if (duration == '-') {
+      return duration;
+    }
+
+    int val = int.parse(duration);
+    if (val >= 60) {
+      val = val % 60;
+    }
+    duration = '';
+    if (val < 10) {
+      duration = '0';
+    }
+    duration += val.toString();
+
+    if (duration.length > 2) {
+      duration = duration.substring(0, 2);
+    }
+
+    return duration;
+  }
+
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -62,13 +89,14 @@ class _ControlBarState extends State<ControlBar> {
             ControlButton(
               isPlaying: widget.isPlaying,
               changeState: widget.changePlayingState,
-              duration: 2, //widget.song.duration,
+              duration: widget.duration?.inMilliseconds, //widget.song.duration,
             ),
             ProgressSlider(
-              duration: 2, //widget.song.duration,
-              progress: widget.progress,
+              duration: widget.duration?.inMilliseconds, //widget.song.duration,
+              position: widget.position?.inMilliseconds,
               isCollapsed: widget.isCollapsed,
               changeProgress: widget.changeProgress,
+              player: widget.player,
             ),
             SizedBox(
               width: 130,
@@ -76,7 +104,7 @@ class _ControlBarState extends State<ControlBar> {
                 fit: BoxFit.scaleDown,
                 child: Text(
                   // "${widget.progress.toStringAsFixed(2)}/${widget.song.duration.toStringAsFixed(2)}",
-                  "${widget.progress.toStringAsFixed(2)}/2.00",
+                  "${widget.position?.inMinutes ?? '-'}:${getDuration('${widget.position?.inSeconds ?? '-'}')}/${widget.duration?.inMinutes ?? '-'}:${getDuration('${widget.duration?.inSeconds ?? '-'}')}",
                   textAlign: TextAlign.right,
                   style: TextStyle(
                     color: const Color(0xFF51698C).withOpacity(0.8),

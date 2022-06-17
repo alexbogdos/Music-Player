@@ -38,6 +38,7 @@ dependencies:
   # Custom dependencies
   file_picker: ^4.6.1
   audioplayers: ^1.0.0
+  shared_preferences: ^2.0.15
 
 dev_dependencies:
   flutter_test:

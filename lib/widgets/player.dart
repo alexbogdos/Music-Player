@@ -1,3 +1,4 @@
+import 'package:audioplayers/audioplayers.dart';
 import 'package:flutter/material.dart';
 import 'package:music_player/classes/song.dart';
 import 'package:music_player/widgets/control_bar.dart';
@@ -10,9 +11,11 @@ class CPlayer extends StatefulWidget {
     required this.width,
     required this.isCollapsed,
     required this.isPlaying,
-    required this.progress,
+    required this.position,
+    required this.duration,
     required this.changePlayingState,
     required this.changeProgress,
+    required this.player,
     Key? key,
   }) : super(key: key);
 
@@ -20,9 +23,11 @@ class CPlayer extends StatefulWidget {
   double width;
   bool isCollapsed;
   bool isPlaying;
-  double progress;
+  Duration? position;
+  Duration? duration;
   Function changePlayingState;
   Function changeProgress;
+  AudioPlayer player;
 
   @override
   State<CPlayer> createState() => _CPlayerState();
@@ -45,10 +50,12 @@ class _CPlayerState extends State<CPlayer> {
             width: widget.width,
             isCollapsed: widget.isCollapsed,
             song: widget.song,
-            progress: widget.progress,
+            position: widget.position,
+            duration: widget.duration,
             isPlaying: widget.isPlaying,
             changePlayingState: widget.changePlayingState,
             changeProgress: widget.changeProgress,
+            player: widget.player,
           )
         ],
       ),

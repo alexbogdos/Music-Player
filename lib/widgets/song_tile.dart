@@ -9,7 +9,7 @@ class SongTile extends StatefulWidget {
   }) : super(key: key);
 
   final Song song;
-  final Function playSong;
+  final Future<void> Function({required Song song}) playSong;
 
   @override
   State<SongTile> createState() => _SongTileState();
@@ -27,14 +27,16 @@ class _SongTileState extends State<SongTile> {
     }
   }
 
+  Future<void> play() async {
+    await widget.playSong(song: widget.song);
+  }
+
   @override
   Widget build(BuildContext context) {
     return Padding(
       padding: const EdgeInsets.only(left: 14, right: 14),
       child: GestureDetector(
-        onTap: () {
-          widget.playSong(song: widget.song);
-        },
+        onTap: play,
         child: Container(
           margin: const EdgeInsets.only(bottom: 10),
           padding: const EdgeInsets.only(left: 14),
@@ -72,7 +74,9 @@ class _SongTileState extends State<SongTile> {
                     ),
                     const SizedBox(height: 2),
                     Text(
-                      widget.song.artist,
+                      widget.song.artist == null
+                          ? "Uknown"
+                          : widget.song.artist.toString(),
                       maxLines: 2,
                       style: TextStyle(
                         color: const Color(0xFF51698C).withOpacity(0.8),
