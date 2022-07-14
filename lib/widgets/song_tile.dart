@@ -1,94 +1,122 @@
 import 'package:flutter/material.dart';
-import 'package:music_player/classes/song.dart';
+import 'package:google_fonts/google_fonts.dart';
+import 'package:test_music_player/widgets/song.dart';
 
-class SongTile extends StatefulWidget {
+class SongTile extends StatelessWidget {
   const SongTile({
+    required this.width,
+    required this.secondaryColor,
+    required this.panelColor,
+    required this.iconSize,
     required this.song,
-    required this.playSong,
+    required this.isCurrentSong,
+    required this.setSong,
+    required this.getPlayState,
+    required this.changePlayState,
+    required this.index,
+    required this.setIndex,
     Key? key,
   }) : super(key: key);
 
+  final double width;
+  final Color secondaryColor;
+  final Color panelColor;
+  final double iconSize;
+
   final Song song;
-  final Future<void> Function({required Song song}) playSong;
+  final bool isCurrentSong;
+  final Function({required Song song, bool play}) setSong;
+  final Function getPlayState;
+  final Function changePlayState;
 
-  @override
-  State<SongTile> createState() => _SongTileState();
-}
-
-class _SongTileState extends State<SongTile> {
-  ImageProvider<Object> getImageProvider(Song song) {
-    if (song.cover != null) {
-      ImageProvider<Object> cover = song.cover as ImageProvider<Object>;
-      return cover;
-    } else {
-      return const AssetImage(
-        "images/placeholder.png",
-      );
-    }
-  }
-
-  Future<void> play() async {
-    await widget.playSong(song: widget.song);
-  }
+  final int index;
+  final Function({required int index}) setIndex;
 
   @override
   Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.only(left: 14, right: 14),
-      child: GestureDetector(
-        onTap: play,
-        child: Container(
-          margin: const EdgeInsets.only(bottom: 10),
-          padding: const EdgeInsets.only(left: 14),
-          height: 100,
-          alignment: Alignment.center,
-          decoration: BoxDecoration(
-            color: const Color(0xFFCED2E6),
-            borderRadius: BorderRadius.circular(30),
+    final String name = song.name;
+    final String? artist = song.artist;
+
+    const String defaultImageSrc = "assets/images/placeholder.png";
+    const ImageProvider defaultImage = AssetImage(defaultImageSrc);
+
+    const double height = 110;
+
+    const Color tileColor = Color(0xFFCED2E6);
+
+    final Color borderColor = isCurrentSong ? Colors.white : panelColor;
+
+    return InkWell(
+      onTap: () {
+        if (isCurrentSong == false) {
+          setSong(song: song, play: true);
+          setIndex(index: index);
+        } else {
+          if (getPlayState() == false) {
+            changePlayState();
+          }
+        }
+      },
+      child: Container(
+        width: width,
+        height: height,
+        decoration: BoxDecoration(
+          color: tileColor,
+          borderRadius: BorderRadius.circular(30),
+          border: Border.all(
+            width: 3.6,
+            color: borderColor,
           ),
-          child: Row(
-            mainAxisSize: MainAxisSize.max,
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              CircleAvatar(
-                foregroundImage: getImageProvider(widget.song),
-                backgroundColor: const Color(0xFF51698C).withOpacity(0.4),
-                radius: 30,
+        ),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Container(
+              width: width * 0.22,
+              padding: EdgeInsets.only(left: width * 0.04),
+              child: CircleAvatar(
+                backgroundImage: defaultImage,
+                backgroundColor: secondaryColor.withOpacity(0.4),
+                radius: iconSize * 0.9,
               ),
-              Container(
-                padding: const EdgeInsets.only(bottom: 10, right: 8),
-                width: 182,
-                height: 600,
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Text(
-                      widget.song.title,
-                      maxLines: 2,
-                      style: const TextStyle(
-                        color: Color(0xFF51698C),
-                        fontSize: 16,
-                        fontWeight: FontWeight.w800,
+            ),
+            SizedBox(
+              width: width * 0.74 - 14,
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.start,
+                children: [
+                  Container(
+                    width: width * 0.74 - 16,
+                    height: height * 0.48,
+                    padding: const EdgeInsets.only(top: 8, right: 8),
+                    alignment: Alignment.bottomLeft,
+                    child: Text(
+                      name,
+                      style: GoogleFonts.ubuntu(
+                        fontSize: iconSize * 0.46,
+                        fontWeight: FontWeight.w500,
+                        color: secondaryColor,
                       ),
                     ),
-                    const SizedBox(height: 2),
-                    Text(
-                      widget.song.artist == null
-                          ? "Uknown"
-                          : widget.song.artist.toString(),
-                      maxLines: 2,
-                      style: TextStyle(
-                        color: const Color(0xFF51698C).withOpacity(0.8),
-                        fontSize: 14,
-                        fontWeight: FontWeight.w600,
+                  ),
+                  Container(
+                    width: width * 0.74 - 16,
+                    height: height * 0.44 - 3.6,
+                    padding: const EdgeInsets.only(top: 4),
+                    alignment: Alignment.topLeft,
+                    child: Text(
+                      artist.toString(),
+                      style: GoogleFonts.ubuntu(
+                        fontSize: iconSize * 0.38,
+                        fontWeight: FontWeight.w400,
+                        color: secondaryColor.withOpacity(0.8),
                       ),
                     ),
-                  ],
-                ),
-              )
-            ],
-          ),
+                  ),
+                ],
+              ),
+            ),
+          ],
         ),
       ),
     );

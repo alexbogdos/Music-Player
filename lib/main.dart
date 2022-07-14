@@ -1,309 +1,288 @@
-import 'dart:async';
-import 'dart:developer';
+import 'dart:io';
+import 'dart:math';
 
 import 'package:audioplayers/audioplayers.dart';
-import 'package:file_picker/file_picker.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter/material.dart';
-import 'package:music_player/classes/song.dart';
-import 'package:music_player/widgets/player.dart';
-import 'package:music_player/widgets/side_bar.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+import 'package:test_music_player/widgets/side_panel.dart';
+import 'package:test_music_player/widgets/player_panel.dart';
+import 'package:test_music_player/widgets/song.dart';
+
 void main() {
-  runApp(const MaterialApp(
-    home: HomePage(),
-  ));
+  runApp(
+    const MaterialApp(
+      home: Home(),
+      debugShowCheckedModeBanner: false,
+    ),
+  );
+  SystemChrome.setEnabledSystemUIMode(SystemUiMode.immersiveSticky);
 }
 
-class HomePage extends StatefulWidget {
-  const HomePage({Key? key}) : super(key: key);
+class Home extends StatefulWidget {
+  const Home({Key? key}) : super(key: key);
 
   @override
-  State<HomePage> createState() => _HomePageState();
+  State<Home> createState() => _HomeState();
 }
 
-class _HomePageState extends State<HomePage> {
-  final AudioPlayer player = AudioPlayer();
-
-  Duration? position, duration;
-  late List<StreamSubscription> streams;
-
-  Duration? streamDuration, streamPosition;
-  PlayerState? state;
+class _HomeState extends State<Home> {
+  bool panelIsExtended = true;
+  String prefsKey = "7810298896";
+  String splitChar = "|";
+  List<Song> songList = [
+    const Song(
+        path: "/home/sebastianhollow/Music/Little Talkings.mp3",
+        name: "Little Talkings",
+        artist: "Sailing Dogs"),
+    const Song(
+        path: "/home/sebastianhollow/Music/The Pill.mp3",
+        name: "The Pill",
+        artist: "Alex Bogdos"),
+  ];
 
   @override
   void initState() {
     super.initState();
-    retrieveSongs().then((value) => refresh());
-    streams = <StreamSubscription>[
-      player.onDurationChanged
-          .listen((it) => setState(() => streamDuration = it)),
-      player.onPlayerStateChanged.listen((it) => setState(() => state = it)),
-      player.onPositionChanged
-          .listen((it) => setState(() => streamPosition = it)),
-      player.onPlayerComplete.listen((it) => playerComplete()),
-      player.onSeekComplete.listen((it) => log('Seek complete!')),
-    ];
+    retrieveSongs().then((value) => setState(() {}));
   }
 
-  @override
-  void dispose() {
-    super.dispose();
-    for (var it in streams) {
-      it.cancel();
+  // ** Song State Machine **
+
+  final player = AudioPlayer();
+  late bool isPlaying = false;
+  late bool clearCache = false;
+  late int currentIndex = -1;
+
+  late Song currentSong = const Song(path: "", name: "", artist: "");
+
+  Future<void> setSong({required Song song, bool play = false}) async {
+    final String path = song.path;
+
+    bool exists = await File(path).exists();
+    if (exists == false) {
+      return;
     }
-  }
 
-  Future<void> playerComplete() async {
-    isPlaying = false;
-    log('Player complete!');
-    position = const Duration(milliseconds: 0);
+    await player.release();
+    clearCache = true;
 
-    await Future.delayed(const Duration(milliseconds: 200), () {
-      setState(() {});
+    await player.setSource(DeviceFileSource(path));
+
+    if (play == true) {
+      await player.resume();
+      if (isPlaying == false) {
+        isPlaying = true;
+      }
+    }
+
+    setState(() {
+      currentSong = song;
     });
   }
 
-  Future<void> getPosition() async {
-    final pos = await player.getCurrentPosition();
-    position = pos;
+  void setIndex({required int index}) {
+    if (index >= 0 && index < songList.length) {
+      currentIndex = index;
+    }
   }
 
-  Future<void> getDuration() async {
-    final dur = await player.getDuration();
-    // setState(() {
-    duration = dur;
-    // });
+  int getIndex() {
+    return currentIndex;
   }
 
-  Future<void> pickFile() async {
-    FilePickerResult? result = await FilePicker.platform.pickFiles(
-      type: FileType.audio,
-      allowMultiple: true,
-    );
+  bool getPlayState() {
+    return isPlaying;
+  }
 
-    if (result != null) {
-      for (int i = 0; i < result.count; i++) {
-        PlatformFile file = result.files[i];
+  bool checkCache() {
+    return clearCache;
+  }
 
-        bool found = false;
-        for (Song song in songs) {
-          if (file.path.toString() == song.path) {
-            found = true;
-            break;
-          }
-        }
-        if (found == false) {
-          setState(
-            () {
-              songs.add(
-                Song(
-                  title: file.name.substring(0, file.name.length - 4),
-                  path: file.path.toString(),
+  void doClearCache() {
+    clearCache = false;
+  }
+
+  Future<void> changePlayState() async {
+    setState(() {
+      isPlaying = !isPlaying;
+    });
+
+    if (isPlaying == true) {
+      await player.resume();
+    } else {
+      await player.pause();
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    // Variables
+    final double height = MediaQuery.of(context).size.height;
+    final double width = MediaQuery.of(context).size.width;
+
+    final double panelWidth =
+        panelIsExtended == true ? max(min(width * 0.3, 440), 320) : 0;
+
+    final double playerWidth = width - panelWidth;
+    final double playerHeight = height * 0.836;
+
+    final double logoWidth = min(playerWidth * 0.48, 380);
+    final double logoHeight = min(playerHeight * 0.48, 380);
+    final double logoSize = max(min(logoWidth, logoHeight), 180);
+
+    const Color panelColor = Color(0xFFECEDF5);
+    const Color backgroundColor = Color(0xFFB6BFDA);
+
+    final Color shadowColor = const Color(0xFF889DC3).withOpacity(0.25);
+    const double blurRadius = 8;
+
+    final double iconSize = max(min(width * 0.036, 35), 25);
+    final Color iconColor = const Color(0xFF172329).withOpacity(0.95);
+
+    const Color mainColor = Color(0xFF172329);
+    const Color secondaryColor = Color(0xFF51698C);
+
+    // Functions
+    void changePanelStatus() {
+      setState(() {
+        panelIsExtended = !panelIsExtended;
+      });
+    }
+
+    return Scaffold(
+      backgroundColor: backgroundColor,
+      body: Stack(
+        children: [
+          Align(
+            alignment: Alignment.bottomRight,
+            child: PlayerPanel(
+              width: width,
+              playerWidth: playerWidth,
+              playerHeight: playerHeight,
+              panelIsExtended: panelIsExtended,
+              logoSize: logoSize,
+              panelColor: panelColor,
+              shadowColor: shadowColor,
+              blurRadius: blurRadius,
+              secondaryColor: secondaryColor,
+              songList: songList,
+              currentSong: currentSong,
+              player: player,
+              changePlayState: changePlayState,
+              isPlaying: isPlaying,
+              getPlayState: getPlayState,
+              checkCache: checkCache,
+              doClearCache: doClearCache,
+              setIndex: setIndex,
+              getIndex: getIndex,
+              setSong: setSong,
+            ),
+          ),
+          Align(
+            alignment: const Alignment(0.99, -0.968),
+            child: IconButton(
+              icon: const Icon(Icons.settings_outlined),
+              iconSize: iconSize,
+              color: iconColor,
+              splashRadius: 26,
+              splashColor: shadowColor.withOpacity(0.4),
+              focusColor: shadowColor.withOpacity(0.4),
+              hoverColor: shadowColor.withOpacity(0.2),
+              highlightColor: shadowColor.withOpacity(0.2),
+              onPressed: () {},
+            ),
+          ),
+          if (panelIsExtended == true)
+            Stack(
+              children: [
+                SidePanel(
+                  panelWidth: panelWidth,
+                  height: height,
+                  songList: songList,
+                  panelColor: panelColor,
+                  shadowColor: shadowColor,
+                  blurRadius: blurRadius,
+                  mainTextColor: mainColor,
+                  secondaryColor: secondaryColor,
+                  iconSize: iconSize,
+                  currentSong: currentSong,
+                  setSong: setSong,
+                  getPlayState: getPlayState,
+                  changePlayState: changePlayState,
+                  setIndex: setIndex,
                 ),
-              );
-            },
-          );
-        }
-      }
-    }
-  }
-
-  Future<void> saveSongs() async {
-    final prefs = await SharedPreferences.getInstance();
-
-    List<String> list = [];
-    for (Song s in songs) {
-      String data = "";
-      data += "${s.title}, ";
-      data += "${s.path}, ";
-      if (s.artist != null) {
-        data += "${s.artist}";
-      }
-      list.add(data);
-    }
-
-    prefs.setStringList('songs', list);
+                Align(
+                  alignment: const Alignment(-0.99, -0.968),
+                  child: IconButton(
+                    icon: const Icon(Icons.close_fullscreen_rounded),
+                    iconSize: iconSize,
+                    color: iconColor,
+                    splashColor: shadowColor.withOpacity(0.4),
+                    focusColor: shadowColor.withOpacity(0.4),
+                    hoverColor: shadowColor.withOpacity(0.2),
+                    highlightColor: shadowColor.withOpacity(0.2),
+                    onPressed: () {
+                      changePanelStatus();
+                    },
+                  ),
+                ),
+              ],
+            )
+          else
+            Align(
+              alignment: const Alignment(-0.99, -0.968),
+              child: IconButton(
+                icon: const Icon(Icons.open_in_full_rounded),
+                iconSize: iconSize,
+                color: iconColor,
+                splashRadius: 26,
+                splashColor: shadowColor.withOpacity(0.4),
+                focusColor: shadowColor.withOpacity(0.4),
+                hoverColor: shadowColor.withOpacity(0.2),
+                highlightColor: shadowColor.withOpacity(0.2),
+                onPressed: () {
+                  changePanelStatus();
+                },
+              ),
+            ),
+        ],
+      ),
+    );
   }
 
   Future<void> retrieveSongs() async {
     final prefs = await SharedPreferences.getInstance();
 
-    if (prefs.containsKey('songs')) {
-      final List<String>? list = prefs.getStringList('songs');
-      if (list != null) {
-        songs.clear();
-        for (String s in list) {
-          List<String> data = s.split(', ');
-          Song song;
-          if (data.length == 3) {
-            song = Song(title: data[0], path: data[1]);
-          } else {
-            song = Song(title: data[0], path: data[1], artist: data[2]);
-          }
-          songs.add(song);
-        }
-      }
+    if (prefs.containsKey(prefsKey) == false) {
+      return;
     }
-  }
+    List<String>? stringList = prefs.getStringList(prefsKey);
 
-  void refresh() {
-    setState(() {});
-  }
-
-  Song currentSong = const Song(title: '', artist: '', path: '');
-
-  Future<void> playSong({required Song song}) async {
-    await player.stop();
-    await player.release();
-    // await player.setSource(DeviceFileSource(song.path));
-    currentSong = song;
-    isPlaying = true;
-
-    await player.play(DeviceFileSource(song.path));
-
-    // await getDuration();
-    // await Future.delayed(const Duration(milliseconds: 200), () {
-    //   setState(() {});
-    // });
-
-    // await getDuration();
-    // await Future.delayed(const Duration(milliseconds: 200), () {
-    //   setState(() {});
-    // });
-    // await Future.delayed(const Duration(seconds: 5), () {
-    //   setState(() {});
-    // });
-  }
-
-  void changePlayingState() {
-    setState(() {
-      isPlaying = !isPlaying;
-      if (isPlaying) {
-        player.resume();
-        if (position?.inMilliseconds as int > 0) {
-          player.seek(position!);
-        }
-      } else {
-        player.pause();
-      }
-    });
-  }
-
-  void collapseView() {
-    setState(() {
-      isCollapsed = !isCollapsed;
-    });
-  }
-
-  void changeProgress({required double value}) {
-    setState(() {
-      position = Duration(milliseconds: value.toInt());
-      player.seek(position as Duration);
-    });
-  }
-
-  bool isCollapsed = false;
-  bool isPlaying = false;
-
-  List<Song> songs = [
-    const Song(
-      title: 'I Am Love',
-      artist: 'Alex Bogdos',
-      path: '',
-    ),
-    const Song(
-      title: 'Bottom of a Bottle',
-      artist: 'Funky Geezer Music',
-      path: '',
-    ),
-    // const Song(
-    //   title: 'Who is She?',
-    //   artist: 'Cockroach',
-    //   path: '',
-    // ),
-  ];
-
-  @override
-  Widget build(BuildContext context) {
-    if (isPlaying) {
-      try {
-        getDuration();
-      } catch (e) {
-        log(e.toString());
-      }
-      try {
-        getPosition();
-      } catch (e) {
-        log(e.toString());
-      }
+    if (stringList == null) {
+      return;
     }
-    return Scaffold(
-      backgroundColor: const Color(0xFFB6BFDA),
-      body: SafeArea(
-        child: isCollapsed
-            ? FittedBox(
-                child: Stack(
-                  children: [
-                    CPlayer(
-                      song: currentSong,
-                      width: 1000,
-                      isCollapsed: isCollapsed,
-                      isPlaying: isPlaying,
-                      duration: duration,
-                      position: position,
-                      changePlayingState: changePlayingState,
-                      changeProgress: changeProgress,
-                      player: player,
-                    ),
-                    IconButton(
-                        onPressed: () {
-                          setState(() {
-                            collapseView();
-                            // songs.clear();
-                            // saveSongs();
-                          });
-                        },
-                        icon: const Icon(Icons.open_in_full_rounded,
-                            color: Color(0xFF172329)))
-                  ],
-                ),
-              )
-            : FittedBox(
-                child: Stack(
-                  children: [
-                    SizedBox(
-                      width: 1000,
-                      child: Align(
-                        alignment: Alignment.centerRight,
-                        child: CPlayer(
-                          song: currentSong,
-                          width: 700,
-                          isCollapsed: isCollapsed,
-                          isPlaying: isPlaying,
-                          duration: duration,
-                          position: position,
-                          changePlayingState: changePlayingState,
-                          changeProgress: changeProgress,
-                          player: player,
-                        ),
-                      ),
-                    ),
-                    Align(
-                      alignment: Alignment.centerLeft,
-                      child: SideBar(
-                        notifyParent: refresh,
-                        playSong: playSong,
-                        collapseView: collapseView,
-                        songs: songs,
-                        pickFile: pickFile,
-                        saveSongs: saveSongs,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-      ),
-    );
+
+    List<Song> list = [];
+    for (String str in stringList) {
+      List<String> data = str.split(splitChar);
+      Song song = Song(path: data[0], name: data[1], artist: data[2]);
+      list.add(song);
+    }
+
+    songList = list;
+  }
+
+  Future<void> saveSongs() async {
+    List<String> stringList = [];
+    for (Song song in songList) {
+      String data =
+          "${song.path}$splitChar${song.name}$splitChar${song.artist}";
+      stringList.add(data);
+    }
+
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setStringList(prefsKey, stringList);
   }
 }
