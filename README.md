@@ -1,16 +1,6 @@
-# test_music_player
+# Music-Player
+ A Minimalistic Music Player Created Using Flutter & Dart.
 
-A new Flutter project.
-
-## Getting Started
-
-This project is a starting point for a Flutter application.
-
-A few resources to get you started if this is your first Flutter project:
-
-- [Lab: Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://docs.flutter.dev/cookbook)
-
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+## Screen Shots
+![Screenshot from 2022-06-18 02-56-42](https://user-images.githubusercontent.com/98696250/174413789-c32c2257-8926-4211-b745-81f4a5a105d3.png)
+![Screenshot from 2022-06-18 02-56-52](https://user-images.githubusercontent.com/98696250/174413792-63ff378b-c28c-442d-9623-ab2f04c27890.png)
