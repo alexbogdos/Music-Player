@@ -4,6 +4,7 @@ import 'dart:math';
 import 'package:audioplayers/audioplayers.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter/material.dart';
+import 'package:permission_handler/permission_handler.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import 'package:test_music_player/widgets/side_panel.dart';
@@ -40,6 +41,20 @@ class _HomeState extends State<Home> {
         path: "/home/sebastianhollow/Music/The Pill.mp3",
         name: "The Pill",
         artist: "Alex Bogdos"),
+    const Song(
+      path: "/storage/emulated/0/Download/Songs/Hotel.mp3",
+      name: "Hotel",
+    ),
+    const Song(
+      path:
+          "/storage/emulated/0/Download/Songs/Masked Wolf - Astronaut in the Ocean(MP3_160K).mp3",
+      name: "Astronaut in the Ocean",
+    ),
+    const Song(
+      path:
+          "/storage/emulated/0/Download/Songs/08 Slash - Anastasia(MP3_160K).mp3",
+      name: "Anastasia",
+    ),
   ];
 
   @override
@@ -118,6 +133,8 @@ class _HomeState extends State<Home> {
 
   @override
   Widget build(BuildContext context) {
+    checkPermission();
+
     // Variables
     final double height = MediaQuery.of(context).size.height;
     final double width = MediaQuery.of(context).size.width;
@@ -284,5 +301,11 @@ class _HomeState extends State<Home> {
 
     final prefs = await SharedPreferences.getInstance();
     await prefs.setStringList(prefsKey, stringList);
+  }
+
+  Future<void> checkPermission() async {
+    if (await Permission.manageExternalStorage.isGranted == false) {
+      Permission.manageExternalStorage.request();
+    }
   }
 }

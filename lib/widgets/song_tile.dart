@@ -1,3 +1,5 @@
+import 'dart:math';
+
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:test_music_player/widgets/song.dart';
@@ -5,6 +7,7 @@ import 'package:test_music_player/widgets/song.dart';
 class SongTile extends StatelessWidget {
   const SongTile({
     required this.width,
+    required this.pHeight,
     required this.secondaryColor,
     required this.panelColor,
     required this.iconSize,
@@ -19,6 +22,7 @@ class SongTile extends StatelessWidget {
   }) : super(key: key);
 
   final double width;
+  final double pHeight;
   final Color secondaryColor;
   final Color panelColor;
   final double iconSize;
@@ -40,7 +44,7 @@ class SongTile extends StatelessWidget {
     const String defaultImageSrc = "assets/images/placeholder.png";
     const ImageProvider defaultImage = AssetImage(defaultImageSrc);
 
-    const double height = 110;
+    final double height = max(min(pHeight * 0.1762, 114), 100);
 
     const Color tileColor = Color(0xFFCED2E6);
 

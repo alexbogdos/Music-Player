@@ -93,6 +93,7 @@ class SidePanel extends StatelessWidget {
                           padding: EdgeInsets.only(bottom: tilePadding),
                           child: SongTile(
                             width: panelWidth - 24,
+                            pHeight: listHeight,
                             secondaryColor: secondaryColor,
                             panelColor: panelColor,
                             iconSize: iconSize,

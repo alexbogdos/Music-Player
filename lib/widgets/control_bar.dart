@@ -87,17 +87,17 @@ class _ControlBarState extends State<ControlBar> {
   }
 
   Future<void> playerComplete() async {
+    duration = 0;
+    tempDuration = -1;
+    sliderPprogress = 0;
+    songPprogress = 0;
+
     int nextIndex = widget.getIndex() + 1;
     if (nextIndex < widget.songList.length) {
       widget.setIndex(index: nextIndex);
       Song nextSong = widget.songList[nextIndex];
       widget.setSong(song: nextSong, play: true);
     } else {
-      await widget.player.release();
-      duration = 0;
-      tempDuration = -1;
-      sliderPprogress = 0;
-      songPprogress = 0;
       widget.changePlayState();
     }
   }
@@ -105,7 +105,7 @@ class _ControlBarState extends State<ControlBar> {
   Future<void> changeProgress({required Duration it}) async {
     songPprogress = it.inMilliseconds;
 
-    if (seeking == false && widget.getPlayState()) {
+    if (seeking == false && widget.getPlayState() && songPprogress < duration) {
       setState(() {
         sliderPprogress = songPprogress.floorToDouble();
       });
@@ -139,7 +139,10 @@ class _ControlBarState extends State<ControlBar> {
   Future<void> seekAtPosition({required int position}) async {
     if (position > 0) {
       Duration dur = Duration(milliseconds: position);
-      widget.player.seek(dur);
+      await widget.player.seek(dur);
+      if (widget.getPlayState() == false) {
+        widget.changePlayState();
+      }
     }
   }
 
@@ -210,6 +213,7 @@ class _ControlBarState extends State<ControlBar> {
                   setState(() {
                     isPlaying = !isPlaying;
                     widget.changePlayState();
+                    print("PR SL $sliderPprogress, SR $sliderPprogress");
                   });
                 }
               },
@@ -236,12 +240,8 @@ class _ControlBarState extends State<ControlBar> {
                 seeking = true;
               }),
               onChangeEnd: ((value) {
-                seekAtPosition(position: value.floor());
-                if (widget.getPlayState() == false && value > 0) {
-                  widget.player.seek(Duration(microseconds: value.floor()));
-                  widget.changePlayState();
-                }
                 seeking = false;
+                seekAtPosition(position: value.floor());
               }),
             ),
           ),
