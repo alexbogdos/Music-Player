@@ -70,10 +70,8 @@ class _ControlBarState extends State<ControlBar> {
   void initState() {
     super.initState();
     streams = <StreamSubscription>[
-      widget.player.onDurationChanged
-          .listen((it) => setState(() => getDuration())),
-      widget.player.onPositionChanged
-          .listen((it) => setState(() => changeProgress(it: it))),
+      widget.player.onDurationChanged.listen((it) => getDuration()),
+      widget.player.onPositionChanged.listen((it) => changeProgress(it: it)),
       widget.player.onPlayerComplete.listen((it) => playerComplete()),
     ];
   }
@@ -98,16 +96,20 @@ class _ControlBarState extends State<ControlBar> {
       Song nextSong = widget.songList[nextIndex];
       widget.setSong(song: nextSong, play: true);
     } else {
-      widget.changePlayState();
+      setState(() {
+        widget.changePlayState();
+      });
     }
   }
 
   Future<void> changeProgress({required Duration it}) async {
     songPprogress = it.inMilliseconds;
 
-    if (seeking == false && widget.getPlayState() && songPprogress < duration) {
+    if (seeking == false &&
+        widget.getPlayState() &&
+        songPprogress <= duration) {
       setState(() {
-        sliderPprogress = songPprogress.floorToDouble();
+        sliderPprogress = songPprogress.toDouble();
       });
     }
   }
@@ -124,20 +126,20 @@ class _ControlBarState extends State<ControlBar> {
     });
   }
 
-  Future<void> getPosition() async {
-    Duration? pos = await widget.player.getCurrentPosition();
+  // Future<void> getPosition() async {
+  //   Duration? pos = await widget.player.getCurrentPosition();
 
-    setState(() {
-      if (pos != null) {
-        songPprogress = pos.inMilliseconds;
-      } else {
-        songPprogress = 0;
-      }
-    });
-  }
+  //   setState(() {
+  //     if (pos != null) {
+  //       songPprogress = pos.inMilliseconds;
+  //     } else {
+  //       songPprogress = 0;
+  //     }
+  //   });
+  // }
 
   Future<void> seekAtPosition({required int position}) async {
-    if (position > 0) {
+    if (position >= 0) {
       Duration dur = Duration(milliseconds: position);
       await widget.player.seek(dur);
       if (widget.getPlayState() == false) {
@@ -213,7 +215,6 @@ class _ControlBarState extends State<ControlBar> {
                   setState(() {
                     isPlaying = !isPlaying;
                     widget.changePlayState();
-                    print("PR SL $sliderPprogress, SR $sliderPprogress");
                   });
                 }
               },
@@ -241,7 +242,8 @@ class _ControlBarState extends State<ControlBar> {
               }),
               onChangeEnd: ((value) {
                 seeking = false;
-                seekAtPosition(position: value.floor());
+
+                seekAtPosition(position: value.toInt());
               }),
             ),
           ),
@@ -250,7 +252,7 @@ class _ControlBarState extends State<ControlBar> {
             width: barWidth * 0.18,
             alignment: Alignment.center,
             child: Text(
-              "${parseMilliseconds(mil: sliderPprogress.floor())} / ${parseMilliseconds(mil: duration.floor())}",
+              "${parseMilliseconds(mil: sliderPprogress.toInt())} / ${parseMilliseconds(mil: duration.toInt())}",
               textAlign: TextAlign.center,
               style: GoogleFonts.ubuntu(
                 color: widget.secondaryColor.withOpacity(0.9),

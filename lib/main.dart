@@ -1,4 +1,4 @@
-import 'dart:io';
+import 'dart:io' show File, Platform;
 import 'dart:math';
 
 import 'package:audioplayers/audioplayers.dart';
@@ -6,6 +6,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter/material.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:test_music_player/pages/settings_page.dart';
 
 import 'package:test_music_player/widgets/side_panel.dart';
 import 'package:test_music_player/widgets/player_panel.dart';
@@ -32,15 +33,30 @@ class _HomeState extends State<Home> {
   bool panelIsExtended = true;
   String prefsKey = "7810298896";
   String splitChar = "|";
+
+  List<String> directories = [
+    "/home/sebastianhollow/Music/",
+    "/home/sebastianhollow/Documents/",
+    "/home/sebastianhollow/Games/",
+    "/home/sebastianhollow/Desktop/",
+    "/home/sebastianhollow/Temp/",
+    "/home/sebastianhollow/Custom Music/",
+    "/home/sebastianhollow/Videos/",
+    "/home/sebastianhollow/Love Songs/",
+    "/home/sebastianhollow/Super Mario Music/",
+    "/home/sebastianhollow/Paris/",
+    "/home/sebastianhollow/School Music/",
+  ];
+
   List<Song> songList = [
-    const Song(
-        path: "/home/sebastianhollow/Music/Little Talkings.mp3",
-        name: "Little Talkings",
-        artist: "Sailing Dogs"),
-    const Song(
-        path: "/home/sebastianhollow/Music/The Pill.mp3",
-        name: "The Pill",
-        artist: "Alex Bogdos"),
+    // const Song(
+    //     path: "/home/sebastianhollow/Music/Little Talkings.mp3",
+    //     name: "Little Talkings",
+    //     artist: "Sailing Dogs"),
+    // const Song(
+    //     path: "/home/sebastianhollow/Music/The Pill.mp3",
+    //     name: "The Pill",
+    //     artist: "Alex Bogdos"),
     const Song(
       path: "/storage/emulated/0/Download/Songs/Hotel.mp3",
       name: "Hotel",
@@ -208,7 +224,22 @@ class _HomeState extends State<Home> {
               focusColor: shadowColor.withOpacity(0.4),
               hoverColor: shadowColor.withOpacity(0.2),
               highlightColor: shadowColor.withOpacity(0.2),
-              onPressed: () {},
+              onPressed: () {
+                Navigator.of(context).push(
+                  MaterialPageRoute(
+                    builder: (context) => SettingsPage(
+                      directories: directories,
+                      backgroundColor: backgroundColor,
+                      panelColor: panelColor,
+                      mainColor: mainColor,
+                      secondaryColor: secondaryColor,
+                      iconColor: iconColor,
+                      shadowColor: shadowColor,
+                      blurRadius: blurRadius,
+                    ),
+                  ),
+                );
+              },
             ),
           ),
           if (panelIsExtended == true)
@@ -221,7 +252,7 @@ class _HomeState extends State<Home> {
                   panelColor: panelColor,
                   shadowColor: shadowColor,
                   blurRadius: blurRadius,
-                  mainTextColor: mainColor,
+                  mainColor: mainColor,
                   secondaryColor: secondaryColor,
                   iconSize: iconSize,
                   currentSong: currentSong,
@@ -304,6 +335,10 @@ class _HomeState extends State<Home> {
   }
 
   Future<void> checkPermission() async {
+    if (Platform.isAndroid == false) {
+      return;
+    }
+
     if (await Permission.manageExternalStorage.isGranted == false) {
       Permission.manageExternalStorage.request();
     }

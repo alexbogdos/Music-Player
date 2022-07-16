@@ -15,7 +15,7 @@ class SidePanel extends StatelessWidget {
     required this.songList,
     required this.shadowColor,
     required this.blurRadius,
-    required this.mainTextColor,
+    required this.mainColor,
     required this.secondaryColor,
     required this.iconSize,
     required this.currentSong,
@@ -31,7 +31,7 @@ class SidePanel extends StatelessWidget {
   final Color panelColor;
   final Color shadowColor;
   final double blurRadius;
-  final Color mainTextColor;
+  final Color mainColor;
   final Color secondaryColor;
   final double iconSize;
 
@@ -75,7 +75,7 @@ class SidePanel extends StatelessWidget {
                   "Your Songs",
                   textAlign: TextAlign.center,
                   style: GoogleFonts.ubuntu(
-                    color: mainTextColor,
+                    color: mainColor,
                     fontSize: iconSize * 0.8,
                     fontWeight: FontWeight.w600,
                   ),
