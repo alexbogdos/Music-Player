@@ -57,6 +57,7 @@ class InfoPreview extends StatelessWidget {
                   fontWeight: FontWeight.w500,
                   color: secondaryColor.withOpacity(0.8),
                 ),
+                textAlign: TextAlign.center,
               ),
               SizedBox(height: logoSize * 0.008),
               Text(
@@ -66,6 +67,7 @@ class InfoPreview extends StatelessWidget {
                   fontWeight: FontWeight.w400,
                   color: secondaryColor.withOpacity(0.8),
                 ),
+                textAlign: TextAlign.center,
               ),
             ],
           ),

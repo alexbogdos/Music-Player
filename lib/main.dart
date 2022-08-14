@@ -1,4 +1,4 @@
-import 'dart:io' show File, Platform;
+import 'dart:io' as io;
 import 'dart:math';
 
 import 'package:audioplayers/audioplayers.dart';
@@ -31,52 +31,17 @@ class Home extends StatefulWidget {
 
 class _HomeState extends State<Home> {
   bool panelIsExtended = true;
-  String prefsKey = "7810298896";
+  String prefsKey = "60149469";
   String splitChar = "|";
 
-  List<String> directories = [
-    "/home/sebastianhollow/Music/",
-    "/home/sebastianhollow/Documents/",
-    "/home/sebastianhollow/Games/",
-    "/home/sebastianhollow/Desktop/",
-    "/home/sebastianhollow/Temp/",
-    "/home/sebastianhollow/Custom Music/",
-    "/home/sebastianhollow/Videos/",
-    "/home/sebastianhollow/Love Songs/",
-    "/home/sebastianhollow/Super Mario Music/",
-    "/home/sebastianhollow/Paris/",
-    "/home/sebastianhollow/School Music/",
-  ];
+  List<String> directories = [];
 
-  List<Song> songList = [
-    // const Song(
-    //     path: "/home/sebastianhollow/Music/Little Talkings.mp3",
-    //     name: "Little Talkings",
-    //     artist: "Sailing Dogs"),
-    // const Song(
-    //     path: "/home/sebastianhollow/Music/The Pill.mp3",
-    //     name: "The Pill",
-    //     artist: "Alex Bogdos"),
-    const Song(
-      path: "/storage/emulated/0/Download/Songs/Hotel.mp3",
-      name: "Hotel",
-    ),
-    const Song(
-      path:
-          "/storage/emulated/0/Download/Songs/Masked Wolf - Astronaut in the Ocean(MP3_160K).mp3",
-      name: "Astronaut in the Ocean",
-    ),
-    const Song(
-      path:
-          "/storage/emulated/0/Download/Songs/08 Slash - Anastasia(MP3_160K).mp3",
-      name: "Anastasia",
-    ),
-  ];
+  List<Song> songList = [];
 
   @override
   void initState() {
     super.initState();
-    retrieveSongs().then((value) => setState(() {}));
+    retrieveDirectories().then((value) => setState(() {}));
   }
 
   // ** Song State Machine **
@@ -91,7 +56,7 @@ class _HomeState extends State<Home> {
   Future<void> setSong({required Song song, bool play = false}) async {
     final String path = song.path;
 
-    bool exists = await File(path).exists();
+    bool exists = await io.File(path).exists();
     if (exists == false) {
       return;
     }
@@ -150,6 +115,17 @@ class _HomeState extends State<Home> {
   @override
   Widget build(BuildContext context) {
     checkPermission();
+    checkExistance();
+    scanDirectories();
+
+    if (songList.isEmpty) {
+      isPlaying = false;
+      clearCache = false;
+      currentIndex = -1;
+
+      currentSong = const Song(path: "", name: "", artist: "");
+      player.release();
+    }
 
     // Variables
     final double height = MediaQuery.of(context).size.height;
@@ -225,20 +201,23 @@ class _HomeState extends State<Home> {
               hoverColor: shadowColor.withOpacity(0.2),
               highlightColor: shadowColor.withOpacity(0.2),
               onPressed: () {
-                Navigator.of(context).push(
-                  MaterialPageRoute(
-                    builder: (context) => SettingsPage(
-                      directories: directories,
-                      backgroundColor: backgroundColor,
-                      panelColor: panelColor,
-                      mainColor: mainColor,
-                      secondaryColor: secondaryColor,
-                      iconColor: iconColor,
-                      shadowColor: shadowColor,
-                      blurRadius: blurRadius,
-                    ),
-                  ),
-                );
+                Navigator.of(context)
+                    .push(
+                      MaterialPageRoute(
+                        builder: (context) => SettingsPage(
+                          directories: directories,
+                          backgroundColor: backgroundColor,
+                          panelColor: panelColor,
+                          mainColor: mainColor,
+                          secondaryColor: secondaryColor,
+                          iconColor: iconColor,
+                          shadowColor: shadowColor,
+                          blurRadius: blurRadius,
+                          saveDirectories: saveDirectories,
+                        ),
+                      ),
+                    )
+                    .then((value) => setState(() {}));
               },
             ),
           ),
@@ -300,7 +279,37 @@ class _HomeState extends State<Home> {
     );
   }
 
-  Future<void> retrieveSongs() async {
+  void checkExistance() {
+    for (int index = songList.length - 1; index >= 0; index--) {
+      Song song = songList[index];
+      bool exists = io.File(song.path).existsSync();
+      if (exists == false) {
+        songList.removeAt(index);
+      }
+    }
+  }
+
+  void scanDirectories() {
+    songList = [];
+    for (String dir in directories) {
+      List<io.FileSystemEntity> files = io.Directory(dir).listSync();
+      for (var file in files) {
+        String extension = file.path.substring(file.path.length - 3);
+        if (extension == "mp3") {
+          List<String> data = file.path.split("/");
+
+          String path = file.path;
+          String name = data.last.substring(0, data.last.length - 4);
+          Song song = Song(path: path, name: name);
+
+          songList.add(song);
+        }
+      }
+    }
+    setState(() {});
+  }
+
+  Future<void> retrieveDirectories() async {
     final prefs = await SharedPreferences.getInstance();
 
     if (prefs.containsKey(prefsKey) == false) {
@@ -312,30 +321,16 @@ class _HomeState extends State<Home> {
       return;
     }
 
-    List<Song> list = [];
-    for (String str in stringList) {
-      List<String> data = str.split(splitChar);
-      Song song = Song(path: data[0], name: data[1], artist: data[2]);
-      list.add(song);
-    }
-
-    songList = list;
+    directories = stringList;
   }
 
-  Future<void> saveSongs() async {
-    List<String> stringList = [];
-    for (Song song in songList) {
-      String data =
-          "${song.path}$splitChar${song.name}$splitChar${song.artist}";
-      stringList.add(data);
-    }
-
+  Future<void> saveDirectories() async {
     final prefs = await SharedPreferences.getInstance();
-    await prefs.setStringList(prefsKey, stringList);
+    await prefs.setStringList(prefsKey, directories);
   }
 
   Future<void> checkPermission() async {
-    if (Platform.isAndroid == false) {
+    if (io.Platform.isAndroid == false) {
       return;
     }
 

@@ -98,7 +98,8 @@ class SidePanel extends StatelessWidget {
                             panelColor: panelColor,
                             iconSize: iconSize,
                             song: songList[index],
-                            isCurrentSong: currentSong == songList[index],
+                            isCurrentSong:
+                                currentSong.path == songList[index].path,
                             setSong: setSong,
                             getPlayState: getPlayState,
                             changePlayState: changePlayState,

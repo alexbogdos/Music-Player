@@ -9,6 +9,7 @@ class FolderTile extends StatelessWidget {
     required this.tileColor,
     required this.secondaryColor,
     required this.iconSize,
+    required this.notifyParent,
     Key? key,
   }) : super(key: key);
 
@@ -18,6 +19,7 @@ class FolderTile extends StatelessWidget {
   final Color tileColor;
   final Color secondaryColor;
   final double iconSize;
+  final Function({required int index}) notifyParent;
 
   @override
   Widget build(BuildContext context) {
@@ -27,29 +29,46 @@ class FolderTile extends StatelessWidget {
           color: tileColor,
           borderRadius: BorderRadius.circular(35),
         ),
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceAround,
+        child: Stack(
           children: [
-            Container(
-              width: (panelWidth * 0.92 - 24) * 0.45 * 0.34,
-              alignment: Alignment.centerRight,
-              child: Icon(
-                Icons.folder_rounded,
-                color: secondaryColor,
-                size: iconSize * 1.2,
-              ),
-            ),
-            Container(
-              width: (panelWidth * 0.92 - 24) * 0.45 * 0.66,
-              alignment: Alignment.center,
-              padding: const EdgeInsets.only(right: 4),
-              child: Text(
-                getFolderName(directory: directories[index]),
-                textAlign: TextAlign.center,
-                style: GoogleFonts.ubuntu(
-                  color: secondaryColor,
-                  fontSize: iconSize * 0.46,
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceAround,
+              children: [
+                Container(
+                  width: (panelWidth * 0.92 - 24) * 0.45 * 0.34,
+                  alignment: Alignment.centerRight,
+                  child: Icon(
+                    Icons.folder_rounded,
+                    color: secondaryColor,
+                    size: iconSize * 1.2,
+                  ),
                 ),
+                Container(
+                  width: (panelWidth * 0.92 - 24) * 0.45 * 0.66,
+                  alignment: Alignment.center,
+                  padding: const EdgeInsets.only(right: 4),
+                  child: Text(
+                    getFolderName(directory: directories[index]),
+                    textAlign: TextAlign.center,
+                    style: GoogleFonts.ubuntu(
+                      color: secondaryColor,
+                      fontSize: iconSize * 0.46,
+                    ),
+                  ),
+                ),
+              ],
+            ),
+            Align(
+              alignment: const Alignment(0.9, -0.88),
+              child: IconButton(
+                icon: Icon(
+                  Icons.delete_forever_rounded,
+                  size: iconSize,
+                  color: Colors.red.shade600.withOpacity(0.6),
+                ),
+                onPressed: () {
+                  notifyParent(index: index);
+                },
               ),
             ),
           ],
@@ -58,7 +77,7 @@ class FolderTile extends StatelessWidget {
 
   String getFolderName({required String directory}) {
     List<String> dir = directory.split("/");
-    int count = dir.length - 1;
-    return dir[count - 1];
+
+    return dir.last;
   }
 }

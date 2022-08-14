@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:test_music_player/widgets/folder_tile.dart';
 
-class SettingsPanel extends StatelessWidget {
+class SettingsPanel extends StatefulWidget {
   const SettingsPanel({
     Key? key,
     required this.panelWidth,
@@ -14,6 +14,7 @@ class SettingsPanel extends StatelessWidget {
     required this.directories,
     required this.tileColor,
     required this.secondaryColor,
+    required this.saveDirectories,
   }) : super(key: key);
 
   final double panelWidth;
@@ -25,20 +26,33 @@ class SettingsPanel extends StatelessWidget {
   final List<String> directories;
   final Color tileColor;
   final Color secondaryColor;
+  final Future<void> Function() saveDirectories;
+
+  @override
+  State<SettingsPanel> createState() => _SettingsPanelState();
+}
+
+class _SettingsPanelState extends State<SettingsPanel> {
+  void removeDirectory({required int index}) {
+    setState(() {
+      widget.directories.removeAt(index);
+      widget.saveDirectories();
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
     return Container(
-      width: panelWidth,
-      height: panelHeight,
+      width: widget.panelWidth,
+      height: widget.panelHeight,
       decoration: BoxDecoration(
-        color: panelColor,
+        color: widget.panelColor,
         borderRadius: BorderRadius.circular(40),
         boxShadow: [
           BoxShadow(
-            color: shadowColor,
+            color: widget.shadowColor,
             offset: const Offset(8, 8),
-            blurRadius: blurRadius,
+            blurRadius: widget.blurRadius,
           ),
         ],
       ),
@@ -46,31 +60,32 @@ class SettingsPanel extends StatelessWidget {
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
           Container(
-            width: panelWidth * 0.94,
-            height: panelHeight * 0.14,
+            width: widget.panelWidth * 0.94,
+            height: widget.panelHeight * 0.14,
             alignment: Alignment.bottomCenter,
             child: Text(
               "Your Folders",
               style: GoogleFonts.ubuntu(
-                fontSize: iconSize * 0.8,
+                fontSize: widget.iconSize * 0.8,
                 fontWeight: FontWeight.w600,
               ),
             ),
           ),
           SizedBox(
-            width: panelWidth * 0.92,
-            height: panelHeight * 0.82,
+            width: widget.panelWidth * 0.92,
+            height: widget.panelHeight * 0.82,
             child: GridView.count(
               crossAxisCount: 2,
               childAspectRatio: 1.78,
-              children: List.generate(directories.length, (index) {
+              children: List.generate(widget.directories.length, (index) {
                 return FolderTile(
-                  directories: directories,
+                  directories: widget.directories,
                   index: index,
-                  panelWidth: panelWidth,
-                  tileColor: tileColor,
-                  secondaryColor: secondaryColor,
-                  iconSize: iconSize,
+                  panelWidth: widget.panelWidth,
+                  tileColor: widget.tileColor,
+                  secondaryColor: widget.secondaryColor,
+                  iconSize: widget.iconSize,
+                  notifyParent: removeDirectory,
                 );
               }),
             ),
