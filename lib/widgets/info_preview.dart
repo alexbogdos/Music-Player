@@ -51,7 +51,7 @@ class InfoPreview extends StatelessWidget {
           child: Column(
             children: [
               Text(
-                name,
+                getName(name: name),
                 style: GoogleFonts.ubuntu(
                   fontSize: logoSize * 0.076,
                   fontWeight: FontWeight.w500,
@@ -74,5 +74,22 @@ class InfoPreview extends StatelessWidget {
         )
       ],
     );
+  }
+
+  String getName({required String name}) {
+    if (name.length > 40) {
+      List<String> data = name.split(" ");
+      String newName = "";
+      int len = 0;
+      for (String str in data) {
+        if (len + str.length > 40) {
+          return "${newName.substring(0, newName.length - 1)}...";
+        } else {
+          newName += "$str ";
+          len += str.length;
+        }
+      }
+    }
+    return name;
   }
 }

@@ -41,10 +41,16 @@ class _HomeState extends State<Home> {
   @override
   void initState() {
     super.initState();
-    retrieveDirectories().then((value) => setState(() {}));
+    retrieveDirectories().then((value) => setState(() {
+          scanDirectories();
+        }));
   }
 
   // ** Song State Machine **
+  final ScrollController scrollController = ScrollController(
+    initialScrollOffset: 0,
+    keepScrollOffset: true,
+  );
 
   final player = AudioPlayer();
   late bool isPlaying = false;
@@ -116,7 +122,6 @@ class _HomeState extends State<Home> {
   Widget build(BuildContext context) {
     checkPermission();
     checkExistance();
-    scanDirectories();
 
     if (songList.isEmpty) {
       isPlaying = false;
@@ -157,6 +162,7 @@ class _HomeState extends State<Home> {
     void changePanelStatus() {
       setState(() {
         panelIsExtended = !panelIsExtended;
+        scanDirectories();
       });
     }
 
@@ -217,7 +223,9 @@ class _HomeState extends State<Home> {
                         ),
                       ),
                     )
-                    .then((value) => setState(() {}));
+                    .then((value) => setState(() {
+                          scanDirectories();
+                        }));
               },
             ),
           ),
@@ -235,13 +243,15 @@ class _HomeState extends State<Home> {
                   secondaryColor: secondaryColor,
                   iconSize: iconSize,
                   currentSong: currentSong,
+                  scrollController: scrollController,
                   setSong: setSong,
                   getPlayState: getPlayState,
                   changePlayState: changePlayState,
+                  scanDirectories: scanDirectories,
                   setIndex: setIndex,
                 ),
                 Align(
-                  alignment: const Alignment(-0.99, -0.968),
+                  alignment: const Alignment(-0.99, -0.938),
                   child: IconButton(
                     icon: const Icon(Icons.close_fullscreen_rounded),
                     iconSize: iconSize,
@@ -259,7 +269,7 @@ class _HomeState extends State<Home> {
             )
           else
             Align(
-              alignment: const Alignment(-0.99, -0.968),
+              alignment: const Alignment(-0.99, -0.938),
               child: IconButton(
                 icon: const Icon(Icons.open_in_full_rounded),
                 iconSize: iconSize,

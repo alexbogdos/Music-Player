@@ -95,7 +95,7 @@ class SongTile extends StatelessWidget {
                     padding: const EdgeInsets.only(top: 8, right: 8),
                     alignment: Alignment.bottomLeft,
                     child: Text(
-                      name,
+                      getName(name: name),
                       style: GoogleFonts.ubuntu(
                         fontSize: iconSize * 0.46,
                         fontWeight: FontWeight.w500,
@@ -124,5 +124,22 @@ class SongTile extends StatelessWidget {
         ),
       ),
     );
+  }
+
+  String getName({required String name}) {
+    if (name.length > 30) {
+      List<String> data = name.split(" ");
+      String newName = "";
+      int len = 0;
+      for (String str in data) {
+        if (len + str.length > 30) {
+          return "${newName.substring(0, newName.length - 1)}...";
+        } else {
+          newName += "$str ";
+          len += str.length;
+        }
+      }
+    }
+    return name;
   }
 }
