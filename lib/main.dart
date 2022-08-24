@@ -300,13 +300,20 @@ class _HomeState extends State<Home> {
   }
 
   void scanDirectories() {
+    String slash = '/';
+    if (io.Platform.isWindows) 
+    {
+      slash = '\\';
+    }
+
+
     songList = [];
     for (String dir in directories) {
       List<io.FileSystemEntity> files = io.Directory(dir).listSync();
       for (var file in files) {
         String extension = file.path.substring(file.path.length - 3);
         if (extension == "mp3") {
-          List<String> data = file.path.split("/");
+          List<String> data = file.path.split(slash);
 
           String path = file.path;
           String name = data.last.substring(0, data.last.length - 4);

@@ -1,3 +1,5 @@
+import 'dart:io' as io;
+
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
@@ -76,7 +78,12 @@ class FolderTile extends StatelessWidget {
   }
 
   String getFolderName({required String directory}) {
-    List<String> dir = directory.split("/");
+    String slash = '/';
+    if (io.Platform.isWindows) 
+    {
+      slash = '\\';
+    }
+    List<String> dir = directory.split(slash);
 
     return dir.last;
   }
