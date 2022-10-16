@@ -127,19 +127,21 @@ class SongTile extends StatelessWidget {
   }
 
   String getName({required String name}) {
-    if (name.length > 30) {
-      List<String> data = name.split(" ");
-      String newName = "";
-      int len = 0;
-      for (String str in data) {
-        if (len + str.length > 30) {
-          return "${newName.substring(0, newName.length - 1)}...";
-        } else {
-          newName += "$str ";
-          len += str.length;
-        }
-      }
-    }
+    // if (name.length > 30) {
+    //   List<String> data = name.split(" ");
+    //   String newName = "";
+    //   int len = 0;
+    //   for (String str in data) {
+    //     if (len + str.length > 30 && newName.length > 1) {
+    //       return "${newName.substring(0, newName.length - 1)}...";
+    //     } else {
+    //       newName += "$str ";
+    //       len += str.length;
+    //     }
+    //   }
+    // }
+
+    name = name.replaceAll('_', " ");
     return name;
   }
 }
